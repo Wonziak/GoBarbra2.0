@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "mongo": "mongo.exe",
     "start": "babel-node App.js"
   },
   "dependencies": {
@@ -10,7 +11,11 @@
     "download-file": "^0.1.5",
     "express": "^4.17.1",
     "google-tts-api": "^0.0.4",
-    "nodemon": "^2.0.2"
+    "json-web-token": "^3.2.0",
+    "mongoose": "^5.8.9",
+    "nodemon": "^2.0.2",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.3",

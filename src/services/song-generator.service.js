@@ -10,15 +10,15 @@ class SongGeneratorService {
     
     const songComponentsPath = './audio/records/GoBarbra';
     const mp3Extension = '.mp3';
-    let cmd = 'ffmpeg'
+    let cmd = 'ffmpeg -y'
 
 
     const filter = ' -filter_complex "[0:a] [1:a] concat=n=16:v=0:a=1 [a]" -map [a] -c:a mp3 ';
     for (let i = 1; i < 9; i++) {
-      cmd = `${cmd} -i ${songComponentsPath}${i}${mp3Extension} -i fromTs${mp3Extension}`;
+      cmd = `${cmd} -i ${songComponentsPath}${i}${mp3Extension} -i ./audio/${recordTitle.replace(/\s/g,'')}_refrain${mp3Extension}`;
     }
 
-    return `${cmd}${filter}./audio/${recordTitle}${mp3Extension}`;
+    return `${cmd}${filter}./audio/${recordTitle.replace(/\s/g,'')}${mp3Extension}`;
   }
 
   generteUrlWithVoiceFromText(text, language, speed = 1) {
@@ -29,11 +29,11 @@ class SongGeneratorService {
     return new Promise((resolve, reject) => {
       downloadFile(url, options, (err) => {
         if (err) throw err;
-        exec(this.generateConcatRecordsCommand(recordTitle), (err) => {
+        exec(this.generateConcatRecordsCommand(recordTitle.replace(/\s/g,'')), (err) => {
           if (!err) {
             resolve();
           } else {
-            reject(error);
+            reject(err);
           }
         });
       })
