@@ -1,13 +1,12 @@
-const googleTTS = require('google-tts-api');
-const downloadFile = require('download-file');
-const { exec } = require('child_process');
-const audioconcat = require('audioconcat')
-const fs = require('fs');
+import googleTTS from 'google-tts-api';
+import downloadFile from 'download-file';
+import { exec } from 'child_process';
+import fs from 'fs';
 
 class SongGeneratorService {
 
   generateConcatRecordsCommand(recordTitle) {
-    
+
     const songComponentsPath = './audio/records/GoBarbra';
     const mp3Extension = '.mp3';
     let cmd = 'ffmpeg -y'
@@ -15,13 +14,13 @@ class SongGeneratorService {
 
     const filter = ' -filter_complex "[0:a] [1:a] concat=n=16:v=0:a=1 [a]" -map [a] -c:a mp3 ';
     for (let i = 1; i < 9; i++) {
-      cmd = `${cmd} -i ${songComponentsPath}${i}${mp3Extension} -i ./audio/${recordTitle.replace(/\s/g,'')}_refrain${mp3Extension}`;
+      cmd = `${cmd} -i ${songComponentsPath}${i}${mp3Extension} -i ./audio/${recordTitle.replace(/\s/g, '')}_refrain${mp3Extension}`;
     }
 
-    return `${cmd}${filter}./audio/${recordTitle.replace(/\s/g,'')}${mp3Extension}`;
+    return `${cmd}${filter}./audio/${recordTitle.replace(/\s/g, '')}${mp3Extension}`;
   }
 
-  generteUrlWithVoiceFromText(text, language, speed = 1) {
+  generteUrlWithVoiceFromText(text, language) {
     return googleTTS(text, language, 1)
   }
 
@@ -29,7 +28,7 @@ class SongGeneratorService {
     return new Promise((resolve, reject) => {
       downloadFile(url, options, (err) => {
         if (err) throw err;
-        exec(this.generateConcatRecordsCommand(recordTitle.replace(/\s/g,'')), (err) => {
+        exec(this.generateConcatRecordsCommand(recordTitle.replace(/\s/g, '')), (err) => {
           if (!err) {
             resolve();
           } else {
@@ -38,24 +37,6 @@ class SongGeneratorService {
         });
       })
     })
-  }
-
-  async readRecordsFileNames() {
-    return new Promise((resolve, reject) => {
-      fs.readdir('./audio/records', (err, files) => {
-        if (err) reject(err);
-        files.forEach((file, index) => {
-          const fileWithPath = `./audio/records/${file}`;
-          files[index] = fileWithPath
-        })
-        resolve(files)
-      });
-    })
-
-  }
-
-  concatRecords(records) {
-    audioconcat(records).concat('all.mp3')
   }
 
 }

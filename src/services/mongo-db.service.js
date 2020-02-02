@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import exec from 'child_process';
 import userSchema from '../models/mongo/user.model';
 import songSchema from '../models/mongo/song.model';
 
@@ -8,8 +7,6 @@ class MongoService {
   get client() {
     return this.dbClient;
   }
-
-
 
   connect() {
     mongoose.connect('mongodb://127.0.0.1:27017', { useNewUrlParser: true });

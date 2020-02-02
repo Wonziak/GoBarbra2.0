@@ -1,31 +1,36 @@
 import mongoDbService from '../../services/mongo-db.service'
-const jwt = require('json-web-token');
-const crypto = require('crypto');
+import  jwt from 'json-web-token';
+import crypto from 'crypto';
+import httpResponseGeneratorService from '../../services/http-response-generator.service';
+import { env } from '../../../config/configuration'
 
 class UserAuthentictor {
 
-    async register(userData) {  
-        userData.password = crypto.createHash('md5').update(userData.password).digest('hex')      
-
-
-        const user =  new mongoDbService.client.models.User(userData);
-
-        await user.save()
-       return;
-    }
-
     async login(userData) {
-        userData.password = crypto.createHash('md5').update(userData.password).digest('hex')      
+        try {
 
-        const user =  await mongoDbService.client.model('User').findOne({email: userData.email, password: userData.password}).select('id email');
-        const payload = {
-            id: user.id,
-            email: user.email,
+            userData.password = crypto.createHash('md5').update(userData.password).digest('hex')
+
+            const user = await mongoDbService.client.model('User').findOne({ email: userData.email, password: userData.password }).select('id email');
+
+            if (!user) {
+                return httpResponseGeneratorService.createResponse(404, 'Cannot find user');
+            }
+
+            const payload = {
+                id: user.id,
+                email: user.email,
+                date: Date.now()
+            }
+
+            const token = jwt.encode(env.jwtSecret, payload).value;
+            user.token = token;
+
+            return httpResponseGeneratorService.createResponse(200, user);
+        } catch (error) {
+            console.log(error)
+            return httpResponseGeneratorService.createResponse(500, 'Cannot login user');
         }
-
-        const token = jwt.encode('secret', payload).value;
-        user.token = token;
-       return user;
     }
 }
 
